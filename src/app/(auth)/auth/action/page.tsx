@@ -67,7 +67,6 @@ function AuthActionContent() {
 
     return (
         <div className="w-full max-w-md px-6">
-            {/* Logo */}
             <div className="flex flex-col items-center mb-8">
                 <Image src="/icon.png" alt="BytesURL" width={56} height={56} />
                 <h1 className="text-2xl font-bold text-white mt-3">BytesURL</h1>
@@ -142,7 +141,6 @@ function AuthActionContent() {
     )
 }
 
-// ← Wrap in Suspense because useSearchParams needs it in Next.js
 export default function AuthActionPage() {
     return (
         <Suspense fallback={

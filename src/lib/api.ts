@@ -5,7 +5,6 @@ const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL,
 })
 
-// Auto attach Firebase token to every request
 api.interceptors.request.use(async (config) => {
     const user = auth.currentUser
     if (user) {

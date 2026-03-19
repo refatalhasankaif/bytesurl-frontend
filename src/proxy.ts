@@ -31,9 +31,8 @@ export async function proxy(req: NextRequest) {
     const token = req.cookies.get('token')?.value
     const role = req.cookies.get('role')?.value
 
-    // ─── Not logged in ───────────────────────────────
+
     if (!token) {
-        // Trying to access protected routes → redirect to login
         if (
             userRoutes.some(route => pathname.startsWith(route)) ||
             adminRoutes.some(route => pathname.startsWith(route))
@@ -43,14 +42,10 @@ export async function proxy(req: NextRequest) {
         return NextResponse.next()
     }
 
-    // ─── Logged in ───────────────────────────────────
-
-    // Trying to access auth pages → redirect to /
     if (authRoutes.some(route => pathname.startsWith(route))) {
         return NextResponse.redirect(new URL('/', req.url))
     }
 
-    // Admin routes → only ADMIN role allowed
     if (adminRoutes.some(route => pathname.startsWith(route))) {
         if (role !== 'ADMIN') {
             return NextResponse.redirect(new URL('/', req.url))

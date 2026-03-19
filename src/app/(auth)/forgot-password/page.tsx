@@ -28,14 +28,14 @@ export default function ForgotPasswordPage() {
 
     return (
         <div className="w-full max-w-md px-6">
-            {/* Logo */}
+
             <div className="flex flex-col items-center mb-8">
                 <Image src="/icon.png" alt="BytesURL" width={56} height={56} />
                 <h1 className="text-2xl font-bold text-white mt-3">BytesURL</h1>
                 <p className="text-gray-400 text-sm mt-1">Reset your password</p>
             </div>
 
-            {/* Card */}
+
             <div className="bg-[#150d30] border border-[#7C3AED]/30 rounded-2xl p-8">
                 {sent ? (
                     <div className="text-center space-y-4">

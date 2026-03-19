@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import './globals.css'
+import { Analytics } from "@vercel/analytics/next"
 import { Providers } from '@/components/providers'
 import { Toaster } from 'react-hot-toast'
 
@@ -22,6 +23,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={geist.className}>
+                <Analytics/>
                 <Providers>
                     {children}
                     <Toaster

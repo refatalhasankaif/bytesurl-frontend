@@ -60,7 +60,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const res      = await api.get('/users/me')
             const userData = res.data.data as DbUser
 
-            // Store role in cookie for proxy
             Cookies.set('role', userData.role, { expires: 7 })
             setDbUser(userData)
         } catch (err) {

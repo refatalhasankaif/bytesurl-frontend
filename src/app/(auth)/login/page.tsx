@@ -40,14 +40,13 @@ export default function LoginPage() {
 
     return (
         <div className="w-full max-w-md px-6">
-            {/* Logo */}
+
             <div className="flex flex-col items-center mb-8">
                 <Image src="/icon.png" alt="BytesURL" width={56} height={56} />
                 <h1 className="text-2xl font-bold text-white mt-3">BytesURL</h1>
                 <p className="text-gray-400 text-sm mt-1">Welcome back</p>
             </div>
 
-            {/* Card */}
             <div className="bg-[#150d30] border border-[#7C3AED]/30 rounded-2xl p-8">
                 <form onSubmit={handleLogin} className="space-y-4">
                     <div>
@@ -89,14 +88,13 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                {/* Divider */}
                 <div className="flex items-center my-6">
                     <div className="flex-1 border-t border-[#7C3AED]/20" />
                     <span className="px-3 text-gray-500 text-sm">or</span>
                     <div className="flex-1 border-t border-[#7C3AED]/20" />
                 </div>
 
-                {/* Google */}
+
                 <button
                     onClick={handleGoogle}
                     className="w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium py-3 rounded-lg transition"
