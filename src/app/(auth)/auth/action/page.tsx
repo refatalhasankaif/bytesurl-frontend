@@ -2,10 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import {
-    confirmPasswordReset,
-    verifyPasswordResetCode,
-} from 'firebase/auth'
+import { confirmPasswordReset, verifyPasswordResetCode } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
@@ -59,48 +56,49 @@ function AuthActionContent() {
 
     if (mode !== 'resetPassword') {
         return (
-            <div className="text-center text-white">
-                <p>Invalid action link.</p>
+            <div className="text-center text-gray-500 text-sm">
+                Invalid action link.
             </div>
         )
     }
 
     return (
         <div className="w-full max-w-md px-6">
+
             <div className="flex flex-col items-center mb-8">
-                <Image src="/icon.png" alt="BytesURL" width={56} height={56} />
-                <h1 className="text-2xl font-bold text-white mt-3">BytesURL</h1>
+                <Image src="/logo.png" alt="BytesURL" width={48} height={48} />
+                <h1 className="text-xl font-bold text-gray-900 mt-3">BytesURL</h1>
                 <p className="text-gray-400 text-sm mt-1">Set new password</p>
             </div>
 
-            <div className="bg-[#150d30] border border-[#7C3AED]/30 rounded-2xl p-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
                 {done ? (
                     <div className="text-center space-y-4">
-                        <div className="text-5xl">✅</div>
-                        <h2 className="text-white font-semibold text-lg">
+                        <div className="text-4xl">✅</div>
+                        <h2 className="text-gray-900 font-semibold text-base">
                             Password Reset!
                         </h2>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-gray-500 text-sm">
                             Your password has been reset successfully.
                         </p>
                         <button
-                            onClick={() => router.push('/login')}
-                            className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-semibold py-3 rounded-lg transition"
+                            onClick={() => router.push('/')}
+                            className="w-full bg-brand-primary hover:bg-[#6D28D9] text-white font-semibold py-3 rounded-lg transition text-sm"
                         >
-                            Back to Login
+                            Back to Home
                         </button>
                     </div>
                 ) : (
                     <form onSubmit={handleReset} className="space-y-4">
                         {email && (
-                            <p className="text-gray-400 text-sm mb-2">
+                            <p className="text-gray-500 text-sm">
                                 Resetting password for{' '}
-                                <span className="text-[#A855F7]">{email}</span>
+                                <span className="text-brand-primary font-medium">{email}</span>
                             </p>
                         )}
 
                         <div>
-                            <label className="text-sm text-gray-300 mb-1 block">
+                            <label className="text-sm text-gray-700 mb-1 block font-medium">
                                 New Password
                             </label>
                             <input
@@ -109,12 +107,12 @@ function AuthActionContent() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="••••••••"
                                 required
-                                className="w-full bg-[#0F0A1E] border border-[#7C3AED]/30 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#7C3AED] transition"
+                                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-brand-primary transition"
                             />
                         </div>
 
                         <div>
-                            <label className="text-sm text-gray-300 mb-1 block">
+                            <label className="text-sm text-gray-700 mb-1 block font-medium">
                                 Confirm Password
                             </label>
                             <input
@@ -123,14 +121,14 @@ function AuthActionContent() {
                                 onChange={(e) => setConfirm(e.target.value)}
                                 placeholder="••••••••"
                                 required
-                                className="w-full bg-[#0F0A1E] border border-[#7C3AED]/30 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#7C3AED] transition"
+                                className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-brand-primary transition"
                             />
                         </div>
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-brand-primary hover:bg-[#6D28D9] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
                             {loading ? 'Resetting...' : 'Reset Password'}
                         </button>
@@ -144,7 +142,7 @@ function AuthActionContent() {
 export default function AuthActionPage() {
     return (
         <Suspense fallback={
-            <div className="text-white text-center">Loading...</div>
+            <div className="text-gray-500 text-sm text-center">Loading...</div>
         }>
             <AuthActionContent />
         </Suspense>
