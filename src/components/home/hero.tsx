@@ -15,6 +15,7 @@ interface ApiError {
         data?: {
             message?: string
         }
+        status?: number
     }
 }
 
@@ -22,19 +23,19 @@ export default function Hero() {
     const { user } = useAuth()
 
     const [originalUrl, setOriginalUrl] = useState('')
-    const [customUrl, setCustomUrl] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [result, setResult] = useState<ShortenedUrl | null>(null)
-    const [copied, setCopied] = useState(false)
+    const [customUrl,   setCustomUrl]   = useState('')
+    const [loading,     setLoading]     = useState(false)
+    const [result,      setResult]      = useState<ShortenedUrl | null>(null)
+    const [copied,      setCopied]      = useState(false)
     const [customError, setCustomError] = useState('')
 
     const handleCustomChange = (val: string) => {
         const clean = val.replace(/[^a-zA-Z0-9-_]/g, '')
         setCustomUrl(clean)
-        if (clean.length === 0) setCustomError('')
-        else if (clean.length < 3) setCustomError('Minimum 3 characters')
+        if (clean.length === 0)     setCustomError('')
+        else if (clean.length < 3)  setCustomError('Minimum 3 characters')
         else if (clean.length > 20) setCustomError('Maximum 20 characters')
-        else setCustomError('')
+        else                        setCustomError('')
     }
 
     const handleShorten = async (e: React.FormEvent) => {
@@ -53,8 +54,22 @@ export default function Hero() {
             setCustomError('')
             toast.success('URL shortened!')
         } catch (err) {
-            const e = err as ApiError
-            toast.error(e?.response?.data?.message ?? 'Failed to shorten URL')
+            const e    = err as ApiError
+            const msg  = e?.response?.data?.message ?? ''
+            const code = e?.response?.status
+
+            
+            if (
+                code === 403 ||
+                msg.toLowerCase().includes('limit') ||
+                msg.toLowerCase().includes('upgrade')
+            ) {
+                toast.error('URL limit reached! Upgrade your plan to create more.', { duration: 4000 })
+            } else if (msg.toLowerCase().includes('custom') || msg.toLowerCase().includes('already')) {
+                toast.error('Custom alias already taken. Try a different one.')
+            } else {
+                toast.error(msg || 'Failed to shorten URL')
+            }
         } finally {
             setLoading(false)
         }
@@ -110,6 +125,7 @@ export default function Hero() {
                                     {loading ? 'Shortening...' : 'Shorten'}
                                 </button>
                             </div>
+
                             <div className="flex flex-col gap-1">
                                 <div className="flex items-center bg-white border border-gray-200 rounded-lg px-4 py-3 gap-2 focus-within:border-brand-primary transition-colors">
                                     <span className="text-gray-400 text-xs shrink-0">
@@ -119,7 +135,7 @@ export default function Hero() {
                                         type="text"
                                         value={customUrl}
                                         onChange={(e) => handleCustomChange(e.target.value)}
-                                        placeholder="custom-url (optional)"
+                                        placeholder="custom-alias (optional)"
                                         maxLength={20}
                                         className="flex-1 bg-transparent text-gray-900 text-sm placeholder-gray-400 focus:outline-none min-w-0"
                                     />
@@ -138,11 +154,12 @@ export default function Hero() {
 
                         </form>
 
+
                         <div
                             style={{
-                                maxHeight: result ? '120px' : '0px',
-                                opacity: result ? 1 : 0,
-                                overflow: 'hidden',
+                                maxHeight:  result ? '120px' : '0px',
+                                opacity:    result ? 1 : 0,
+                                overflow:   'hidden',
                                 transition: 'max-height 0.4s ease, opacity 0.4s ease',
                             }}
                         >
@@ -160,10 +177,11 @@ export default function Hero() {
                                 </div>
                                 <button
                                     onClick={handleCopy}
-                                    className={`shrink-0 text-xs font-semibold px-3 py-1.5 rounded-md border transition-all ${copied
+                                    className={`shrink-0 text-xs font-semibold px-3 py-1.5 rounded-md border transition-all ${
+                                        copied
                                             ? 'bg-green-50 text-green-600 border-green-200'
                                             : 'bg-white text-brand-primary border-brand-primary hover:bg-purple-50'
-                                        }`}
+                                    }`}
                                 >
                                     {copied ? 'Copied!' : 'Copy'}
                                 </button>
@@ -190,9 +208,9 @@ export default function Hero() {
 
                         <div className="flex items-center gap-10">
                             {[
-                                { value: '10', label: 'Free URLs' },
+                                { value: '10',  label: 'Free URLs' },
                                 { value: '500', label: 'PRO / month' },
-                                { value: '∞', label: 'Ultimate' },
+                                { value: '∞',   label: 'Ultimate' },
                             ].map((s) => (
                                 <div key={s.label} className="flex flex-col items-center gap-1">
                                     <span className="text-xl font-bold text-gray-900">{s.value}</span>
