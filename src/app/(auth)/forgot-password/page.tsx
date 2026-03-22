@@ -19,8 +19,10 @@ export default function ForgotPasswordPage() {
             await forgotPassword(email)
             setSent(true)
             toast.success('Reset email sent!')
-        } catch {
-            toast.error('Failed to send reset email')
+        } catch (err: unknown) {
+            const error   = err as { message?: string }
+            const message = error?.message ?? 'Failed to send reset email'
+            toast.error(message)
         } finally {
             setLoading(false)
         }
@@ -74,7 +76,7 @@ export default function ForgotPasswordPage() {
                             disabled={loading}
                             className="w-full bg-brand-primary hover:bg-[#6D28D9] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
-                            {loading ? 'Sending...' : 'Send Reset Link'}
+                            {loading ? 'Checking...' : 'Send Reset Link'}
                         </button>
 
                         <Link
