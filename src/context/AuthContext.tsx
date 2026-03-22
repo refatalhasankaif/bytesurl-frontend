@@ -13,20 +13,21 @@ import {
 import Cookies from 'js-cookie'
 import { auth } from '@/lib/firebase'
 import api from '@/lib/api'
+import toast from 'react-hot-toast'
 
 interface DbUser {
-    id:           string
-    email:        string
-    name:         string
-    avatarUrl:    string | null
-    role:         'USER' | 'ADMIN'
-    status:       'ACTIVE' | 'SUSPENDED'
-    createdAt:    string
-    updatedAt:    string | null
+    id: string
+    email: string
+    name: string
+    avatarUrl: string | null
+    role: 'USER' | 'ADMIN'
+    status: 'ACTIVE' | 'SUSPENDED'
+    createdAt: string
+    updatedAt: string | null
     subscription: {
-        id:          string
-        plan:        'FREE' | 'PRO' | 'ULTIMATE'
-        urlLimit:    number
+        id: string
+        plan: 'FREE' | 'PRO' | 'ULTIMATE'
+        urlLimit: number
         urlsCreated: number
         purchasedAt: string
         lastResetAt: string
@@ -34,45 +35,71 @@ interface DbUser {
 }
 
 interface AuthContextType {
-    user:           User | null
-    dbUser:         DbUser | null
-    loading:        boolean
-    login:          (email: string, password: string) => Promise<void>
-    register:       (email: string, password: string, name: string) => Promise<void>
-    googleLogin:    () => Promise<void>
-    logout:         () => Promise<void>
+    user: User | null
+    dbUser: DbUser | null
+    loading: boolean
+    login: (email: string, password: string) => Promise<void>
+    register: (email: string, password: string, name: string) => Promise<void>
+    googleLogin: () => Promise<void>
+    logout: () => Promise<void>
     forgotPassword: (email: string) => Promise<void>
-    refreshDbUser:  () => Promise<void>
+    refreshDbUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType)
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const [user,    setUser]    = useState<User | null>(null)
-    const [dbUser,  setDbUser]  = useState<DbUser | null>(null)
-    const [loading, setLoading] = useState(true)
-    const skipSync              = useRef(false)
 
-    const fetchDbUser = async (firebaseUser: User): Promise<DbUser | null> => {
+class SuspendedError extends Error {
+    constructor() { super('Account suspended') }
+}
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+    const [user, setUser] = useState<User | null>(null)
+    const [dbUser, setDbUser] = useState<DbUser | null>(null)
+    const [loading, setLoading] = useState(true)
+    const skipSync = useRef(false)
+
+    const clearSession = async () => {
+        await signOut(auth)
+        Cookies.remove('token')
+        Cookies.remove('role')
+        setUser(null)
+        setDbUser(null)
+    }
+
+    const fetchDbUser = async (firebaseUser: User): Promise<DbUser> => {
+        const token = await firebaseUser.getIdToken()
+        Cookies.set('token', token, { expires: 7 })
+
         try {
-            const token = await firebaseUser.getIdToken()
-            Cookies.set('token', token, { expires: 7 })
-            const res      = await api.get('/users/me')
+            const res = await api.get('/users/me')
             const userData = res.data.data as DbUser
             Cookies.set('role', userData.role, { expires: 7 })
             return userData
         } catch (err: unknown) {
-            const error = err as { response?: { status?: number } }
-            if (error?.response?.status === 404) return null
-            console.error('fetchDbUser error', err)
-            return null
+            const error = err as { response?: { status?: number; data?: { message?: string } } }
+            const status = error?.response?.status
+
+            if (status === 403) {
+
+                await clearSession()
+                throw new SuspendedError()
+            }
+            if (status === 404) {
+                throw new Error('User not found')
+            }
+            throw new Error(error?.response?.data?.message ?? 'Failed to fetch user')
         }
     }
 
     const refreshDbUser = async () => {
         if (!user) return
-        const userData = await fetchDbUser(user)
-        if (userData) setDbUser(userData)
+        try {
+            const userData = await fetchDbUser(user)
+            setDbUser(userData)
+        } catch {
+
+        }
     }
 
     useEffect(() => {
@@ -81,15 +108,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 setLoading(false)
                 return
             }
-            setUser(firebaseUser)
+
             if (firebaseUser) {
-                const userData = await fetchDbUser(firebaseUser)
-                if (userData) setDbUser(userData)
+                try {
+                    const userData = await fetchDbUser(firebaseUser)
+                    setUser(firebaseUser)
+                    setDbUser(userData)
+                } catch (err) {
+                    if (err instanceof SuspendedError) {
+
+                    }
+
+                }
             } else {
+                setUser(null)
                 setDbUser(null)
                 Cookies.remove('token')
                 Cookies.remove('role')
             }
+
             setLoading(false)
         })
         return () => unsubscribe()
@@ -101,22 +138,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await api.post('/auth/register', { email, password, name })
 
             const { user: firebaseUser } = await signInWithEmailAndPassword(auth, email, password)
-            const token = await firebaseUser.getIdToken()
-            Cookies.set('token', token, { expires: 7 })
-
             const userData = await fetchDbUser(firebaseUser)
-            if (userData) {
-                setDbUser(userData)
-                Cookies.set('role', userData.role, { expires: 7 })
-            }
 
             setUser(firebaseUser)
+            setDbUser(userData)
         } catch (err: unknown) {
             const error = err as {
                 response?: { data?: { message?: string } }
-                message?:  string
+                message?: string
             }
-            const message = error?.response?.data?.message ?? error?.message
+            const message = error?.response?.data?.message ?? error instanceof Error ? (err as Error).message : undefined
             if (message === 'Email already exists') throw new Error('Email already in use')
             throw new Error(message ?? 'Registration failed')
         } finally {
@@ -128,24 +159,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         skipSync.current = true
         try {
             const { user: firebaseUser } = await signInWithEmailAndPassword(auth, email, password)
-            const token = await firebaseUser.getIdToken()
-            Cookies.set('token', token, { expires: 7 })
-
             const userData = await fetchDbUser(firebaseUser)
-            if (!userData) throw new Error('User not found')
-            if (userData.status === 'SUSPENDED') throw new Error('Account suspended')
 
             setUser(firebaseUser)
             setDbUser(userData)
         } catch (err: unknown) {
-            const error = err as { code?: string, message?: string }
+            const error = err as { code?: string; message?: string }
+
             if (
                 error?.code === 'auth/invalid-credential' ||
-                error?.code === 'auth/wrong-password'     ||
+                error?.code === 'auth/wrong-password' ||
                 error?.code === 'auth/user-not-found'
             ) {
                 throw new Error('Invalid email or password')
             }
+
+            if (err instanceof SuspendedError) throw new Error('Your account has been suspended')
+            if (error?.message === 'User not found') throw new Error('User not found')
+
             throw new Error(error?.message ?? 'Login failed')
         } finally {
             skipSync.current = false
@@ -155,26 +186,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const googleLogin = async () => {
         skipSync.current = true
         try {
-            const provider               = new GoogleAuthProvider()
+            const provider = new GoogleAuthProvider()
             const { user: firebaseUser } = await signInWithPopup(auth, provider)
-            const token                  = await firebaseUser.getIdToken()
+
+            const token = await firebaseUser.getIdToken()
             Cookies.set('token', token, { expires: 7 })
 
             await api.post('/auth/google', {
-                email:     firebaseUser.email,
-                name:      firebaseUser.displayName,
+                email: firebaseUser.email,
+                name: firebaseUser.displayName,
                 avatarUrl: firebaseUser.photoURL,
             })
+
             const userData = await fetchDbUser(firebaseUser)
-            if (userData) {
-                setDbUser(userData)
-                Cookies.set('role', userData.role, { expires: 7 })
-            }
 
             setUser(firebaseUser)
+            setDbUser(userData)
         } catch (err: unknown) {
-            const error = err as { code?: string, message?: string }
+            const error = err as { code?: string; message?: string }
+
             if (error?.code === 'auth/popup-closed-by-user') return
+
+            if (err instanceof SuspendedError) {
+                throw new Error('Your account has been suspended')
+            }
+
             throw new Error(error?.message ?? 'Google login failed')
         } finally {
             skipSync.current = false
@@ -182,11 +218,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     const logout = async () => {
-        await signOut(auth)
-        Cookies.remove('token')
-        Cookies.remove('role')
-        setUser(null)
-        setDbUser(null)
+        await clearSession()
     }
 
     const forgotPassword = async (email: string) => {
