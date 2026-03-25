@@ -17,6 +17,22 @@ A full-stack URL shortener with click analytics, subscription plans, and an admi
 
 ---
 
+## 🎥 Video Explanation
+
+👉 https://drive.google.com/file/d/1igAGwv_Oqe9kd6C3JCxXdulIWQGJfFrR/view?usp=drive_link
+
+A complete walkthrough of the project covering features, architecture, and implementation details.
+
+---
+
+## 🔐 Admin Credentials Access
+
+👉 https://t.me/refatalhasan
+
+For admin access credentials, feel free to reach out via Telegram.
+
+---
+
 ## 📦 Repositories
 
 | | Link |
