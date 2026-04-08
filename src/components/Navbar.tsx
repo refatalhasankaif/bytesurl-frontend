@@ -17,7 +17,6 @@ export default function Navbar() {
     const pathname = usePathname()
 
     const moreLinks = [
-        { label: "Service Status", href: "/status" },
         { label: "Privacy Policy", href: "/privacy" },
         { label: "Terms & Conditions", href: "/terms" },
         { label: "Chat with AI", href: "/ai" },
