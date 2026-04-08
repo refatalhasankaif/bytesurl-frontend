@@ -27,6 +27,11 @@ A complete walkthrough of the project covering features, architecture, and imple
 
 ## 🔐 Admin Credentials Access
 
+Admin Email: admin@shorturl.com
+Admin Password: Admin@123456
+
+---
+
 👉 https://t.me/refatalhasan
 
 For admin access credentials, feel free to reach out via Telegram.
