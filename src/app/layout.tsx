@@ -4,11 +4,13 @@ import './globals.css'
 import { Analytics } from "@vercel/analytics/next"
 import { Providers } from '@/components/providers'
 import { Toaster } from 'react-hot-toast'
+import ClientLoaderWrapper from '@/components/ClientLoaderWrapper'
+import FloatingAIButton from '@/components/FloatingAIButton'
 
 const geist = Geist({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title:       'BytesURL — Smart URL Shortener',
+    title: 'BytesURL — Smart URL Shortener',
     description: 'Shorten URLs, track analytics, and manage links with BytesURL',
     icons: {
         icon: '/logo.png',
@@ -23,16 +25,20 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={geist.className}>
-                <Analytics/>
+                <Analytics />
                 <Providers>
-                    {children}
+                    <ClientLoaderWrapper>
+                        {children}
+                    </ClientLoaderWrapper>
+
+                    <FloatingAIButton/>
                     <Toaster
                         position="top-right"
                         toastOptions={{
                             style: {
                                 background: '#1a0f3a',
-                                color:      '#fff',
-                                border:     '1px solid #7C3AED',
+                                color: '#fff',
+                                border: '1px solid #7C3AED',
                             }
                         }}
                     />

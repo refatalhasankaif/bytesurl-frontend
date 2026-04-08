@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
 import api from '@/lib/api'
 import toast from 'react-hot-toast'
+import HeroParticles from '../HeroParticles'
 
 interface ShortenedUrl {
     shortUrlFull: string
@@ -85,9 +86,10 @@ export default function Hero() {
     return (
         <section
             id="home"
-            className="w-full min-h-screen flex items-center justify-center px-4 py-20 bg-white"
+            className="w-full h-[80vh] min-h-130 relative overflow-hidden flex items-center justify-center px-4 py-20 bg-white"
         >
-            <div className="w-full max-w-2xl flex flex-col items-center text-center gap-6">
+             <HeroParticles /> 
+            <div className="w-full max-w-2xl flex flex-col items-center text-center gap-6 relative z-10">
 
                 <p className="text-brand-primary text-xs font-semibold tracking-widest uppercase">
                     URL Shortener
@@ -164,7 +166,7 @@ export default function Hero() {
                             }}
                         >
                             <div className="bg-gray-50 border border-purple-200 rounded-lg px-4 py-3 flex items-center justify-between gap-3">
-                                <div className="flex flex-col gap-0.5 min-w-0">
+                                <div className="flex flex-col items-start gap-0.5 min-w-0">
                                     <span className="text-gray-400 text-xs">Short URL</span>
                                     <a
                                         href={result?.shortUrlFull}

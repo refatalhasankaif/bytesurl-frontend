@@ -20,7 +20,7 @@ const values = [
 
 export default function About() {
     return (
-        <section id="about" className="w-full py-20 px-4 bg-white">
+        <section id="about" className="w-full py-40 px-4 bg-white">
             <div className="mx-auto max-w-5xl">
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">

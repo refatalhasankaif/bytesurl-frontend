@@ -47,7 +47,7 @@ const reviews = [
 
 export default function Reviews() {
     return (
-        <section id="reviews" className="w-full py-20 px-4 bg-gray-50">
+        <section id="reviews" className="w-full py-40 px-4 bg-gray-50">
             <div className="mx-auto max-w-5xl">
 
                 <div className="text-center mb-12">
