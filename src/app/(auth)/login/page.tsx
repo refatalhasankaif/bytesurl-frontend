@@ -7,12 +7,27 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import toast from 'react-hot-toast'
 
+type Role = 'USER' | 'ADMIN'
+
+const DEMO_ROLES: { role: Role; label: string; email: string; password: string }[] = [
+    { role: 'USER',  label: 'User',  email: 'user@shorturl.com',  password: 'User@123456'  },
+    { role: 'ADMIN', label: 'Admin', email: 'admin@shorturl.com', password: 'Admin@123456' },
+]
+
 export default function LoginPage() {
-    const [email,    setEmail]    = useState('')
-    const [password, setPassword] = useState('')
-    const [loading,  setLoading]  = useState(false)
-    const { login, googleLogin }  = useAuth()
+    const [email,      setEmail]      = useState('')
+    const [password,   setPassword]   = useState('')
+    const [loading,    setLoading]    = useState(false)
+    const [activeDemo, setActiveDemo] = useState<Role | null>(null)
+    const { login, googleLogin }      = useAuth()
     const router = useRouter()
+
+    const fillDemo = (role: Role) => {
+        const demo = DEMO_ROLES.find((r) => r.role === role)!
+        setEmail(demo.email)
+        setPassword(demo.password)
+        setActiveDemo(role)
+    }
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -49,13 +64,54 @@ export default function LoginPage() {
             </div>
 
             <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+                
+                <div className="mb-5 space-y-2">
+                    <p className="text-xs text-gray-400 text-center">Try a demo account</p>
+                    <div className="grid grid-cols-2 gap-2">
+                        {DEMO_ROLES.map(({ role, label }) => {
+                            const isActive = activeDemo === role
+                            const isAdmin  = role === 'ADMIN'
+                            return (
+                                <button
+                                    key={role}
+                                    type="button"
+                                    onClick={() => fillDemo(role)}
+                                    disabled={loading}
+                                    className={`
+                                        relative py-2 rounded-lg border text-xs font-semibold
+                                        transition-all duration-150 cursor-pointer select-none
+                                        focus-visible:outline-none disabled:opacity-50 disabled:cursor-not-allowed
+                                        ${isAdmin
+                                            ? isActive
+                                                ? 'bg-brand-primary text-white border-brand-primary shadow-sm scale-[1.03]'
+                                                : 'bg-purple-50 text-brand-primary border-purple-200 hover:border-brand-primary hover:scale-[1.02]'
+                                            : isActive
+                                                ? 'bg-gray-800 text-white border-gray-800 shadow-sm scale-[1.03]'
+                                                : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-400 hover:scale-[1.02]'
+                                        }
+                                    `}
+                                >
+                                    {label}
+                                    {isActive && (
+                                        <span className={`absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full ${isAdmin ? 'bg-brand-primary' : 'bg-gray-800'}`}>
+                                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        </span>
+                                    )}
+                                </button>
+                            )
+                        })}
+                    </div>
+                </div>
+
                 <form onSubmit={handleLogin} className="space-y-4">
                     <div>
                         <label className="text-sm text-gray-700 mb-1 block font-medium">Email</label>
                         <input
                             type="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => { setEmail(e.target.value); setActiveDemo(null) }}
                             placeholder="you@example.com"
                             required
                             className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-brand-primary transition"
@@ -67,7 +123,7 @@ export default function LoginPage() {
                         <input
                             type="password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => { setPassword(e.target.value); setActiveDemo(null) }}
                             placeholder="••••••••"
                             required
                             className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:border-brand-primary transition"
