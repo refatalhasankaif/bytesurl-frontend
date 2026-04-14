@@ -1,4 +1,4 @@
-# BytesURL
+# BytesURL Frontend
 
 A modern, full-featured URL shortener built with Next.js and Tailwind CSS, designed for performance, scalability, and an exceptional user experience. This platform goes beyond simple link shortening by combining powerful analytics, flexible subscription plans, and an intelligent AI assistant.
 
