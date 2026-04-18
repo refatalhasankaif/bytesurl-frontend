@@ -7,19 +7,18 @@ import { useAuth } from "@/context/AuthContext"
 export default function Footer() {
     const currentYear = new Date().getFullYear()
     const { user, dbUser } = useAuth()
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL
 
     const navigationLinks = [
-        { label: "Home", href: `${appUrl}/#home` },
-        { label: "Features", href: `${appUrl}/#features` },
-        { label: "Pricing", href: `${appUrl}/#pricing` },
-        { label: "Reviews", href: `${appUrl}/#reviews` },
-        { label: "About", href: `${appUrl}/#about` },
-        { label: "Stats", href: `${appUrl}/#stats` },
-        { label: "Partners", href: `${appUrl}/#partners` },
-        { label: "Follow Us", href: `${appUrl}/#follow` },
-        { label: "Careers", href: `${appUrl}/#careers` },
-        { label: "Contact", href: `${appUrl}/#contact` },
+        { label: "Home", href: `/#home` },
+        { label: "Features", href: `/#features` },
+        { label: "Pricing", href: `/#pricing` },
+        { label: "Reviews", href: `/#reviews` },
+        { label: "About", href: `/#about` },
+        { label: "Stats", href: `/#stats` },
+        { label: "Partners", href: `/#partners` },
+        { label: "Follow Us", href: `/#follow` },
+        { label: "Careers", href: `/#careers` },
+        { label: "Contact", href: `/#contact` },
     ]
 
     const accountLinks = user
@@ -38,7 +37,6 @@ export default function Footer() {
             { label: "Register", href: "/register" },
         ]
 
-    // split for desktop
     const mid = Math.ceil(navigationLinks.length / 2)
     const navCol1 = navigationLinks.slice(0, mid)
     const navCol2 = navigationLinks.slice(mid)
