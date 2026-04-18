@@ -9,7 +9,7 @@ export default function Careers() {
     ]
 
     return (
-        <section className="w-full py-40 px-4 bg-white">
+        <section id='careers' className="w-full py-40 px-4 bg-white">
             <div className="mx-auto max-w-6xl">
 
 

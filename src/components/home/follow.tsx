@@ -41,7 +41,7 @@ export default function Follow() {
     ]
 
     return (
-        <section className="w-full py-40 px-4 bg-gray-50">
+        <section id="follow" className="w-full py-40 px-4 bg-gray-50">
             <div className="mx-auto max-w-6xl">
 
 

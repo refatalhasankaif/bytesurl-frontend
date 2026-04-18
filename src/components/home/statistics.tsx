@@ -34,7 +34,7 @@ export default function Stats() {
     ]
 
     return (
-        <section className="w-full py-40 px-4 bg-gray-50">
+        <section id='stats' className="w-full py-40 px-4 bg-gray-50">
             <div className="mx-auto max-w-6xl">
 
 
